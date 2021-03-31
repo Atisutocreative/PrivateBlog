@@ -1,83 +1,98 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
+import './App.css';
 import {
-    BrowserRouter as Router,
     Switch,
     Route,
-    Link,
     NavLink,
     useHistory,
-    Redirect,
-} from "react-router-dom";
-import './App.css';
-import Blog from "./pages/Blog";
-import BlogPost from "./pages/Blogpost";
-import Home from "./pages/Home"
-
+    Redirect
+} from 'react-router-dom';
+import Home from "./pages/Home";
+//import Login from "./pages/Login";
+import BlogPost from "./pages/BlogPost";
+import BlogSingel from "./component/BlogSingel";
+//import Blog from "../component/Blog";
+//import TopMenu from "./component/TopMenu";
+//import LogOut from "./pages/LogOut";
 
 
 function App() {
-  // We houden in de state bij of iemand is "ingelogd" (simpele versie)
-  const [isAuthenticated, toggleIsAuthenticated ] = useState(false);
-  const history = useHistory();
+    // We houden in de state bij of iemand is "ingelogd" (simpele versie)
+    const [isAuthenticated, toggleIsAuthenticated] = useState(false);
+    const history = useHistory();
+    //console.log(isAuthenticated)
 
+    function handleClickLogIn() {
+        history.push("/blogposts");
+        toggleIsAuthenticated(true)
+    }
 
-  function handleClick() {
-      console.log("je heb geklikt");
-      history.push('/')
+    function handleClickLogOut() {
+        history.push("/");
+        toggleIsAuthenticated(false)
+    }
 
-
-  }
-  return (
+    return (
         <>
-<Router>
-        <nav>
-                <ul>
-                    <li>
-                        <NavLink to='/' activeClassName="active-link" >home</NavLink>
-                    </li>
-                    {isAuthenticated === true &&
-                    <li>
-                        <NavLink to='/login' activeClassName="active-link">Login</NavLink>
-                    </li>
-                    }
-                    <li>
-                        <NavLink to='/blog' activeClassName="active-link" >Blog</NavLink>
-                    </li>
+            <nav>
+                <div className="nav-container">
+                    <ul>
+                        <li>
+                            <NavLink to="/" exact activeClassName="active-link"> Home</NavLink>
+                        </li>
+                        {isAuthenticated && <li>
+                            <NavLink to="/blogposts" activeClassName="active-link">
+                                Blog Overzicht
+                            </NavLink>
+                        </li>}
 
-                    <li>
-                        <NavLink to='/blogPost' activeClassName="active-link" >BlogPost</NavLink>
-                    </li>
-                </ul>
-
-        </nav>
-
+                        {!isAuthenticated ? <li>
+                                <NavLink to="/login" activeClassName="active-link">
+                                    Inloggen
+                                </NavLink>
+                            </li>
+                            :
+                            <li>
+                                <NavLink to="/logout" activeClassName="active-link">
+                                    Uitloggen
+                                </NavLink>
+                            </li>}
+                    </ul>
+                </div>
+            </nav>
             <Switch>
-                <Route exact path='/'>//?:home
-                    <Home />
+                <Route exact path="/">
+                    <Home/>
                 </Route>
 
-                <Route path='/login'>
-                    {isAuthenticated === true
-                        ?
-                    <section>
-                        <h1>Login</h1>
-                        <button onClick={handleClick} type="button">Inloggen</button>
-                    </section>
+                <Route path="/login">
+
+                    <div className="main">
+                        <button type="button" className="login-button" onClick={handleClickLogIn}>Log in</button>
+                    </div>
+                </Route>
+
+                <Route path="/logout">
+                    <div className="main">
+                        <button type="button" className="login-button" onClick={handleClickLogOut}>Uitloggen</button>
+                    </div>
+
+                </Route>
+                <Route exact path="/blogposts" component={BlogPost}>
+                    {isAuthenticated ? <BlogPost/>
                         :
-                        <Redirect to="/"/>}
-                </Route>
+                        <Redirect to="/" />}
 
-                <Route path='/blog/'>//?:id
-                    <Blog />
                 </Route>
-
-                <Route path='/blogpost'>
-                    <BlogPost />
+                <Route path="/blogsingels/:slug" component={BlogSingel}>
+                    {isAuthenticated ? <BlogSingel />
+                        :
+                        <Redirect to="/" />}
                 </Route>
             </Switch>
-</Router>
+
         </>
-  );
+    );
 }
 
 export default App;
